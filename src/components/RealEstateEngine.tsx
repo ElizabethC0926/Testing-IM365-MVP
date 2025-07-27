@@ -90,15 +90,15 @@ const RealEstateEngine: React.FC = () => {
   const renderInputForm = () => (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
-          AI Real Estate Investment Engine
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
+          Train decades of investing in minutes.
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Personalized property investment decisions with tax, risk, and regulatory insights powered by advanced algorithms
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          Bias reduction | Risk-aware actions | Long-term rewards
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         {/* Financial Status */}
         <Card className="shadow-elegant">
           <CardHeader>
@@ -233,8 +233,8 @@ const RealEstateEngine: React.FC = () => {
                   <SelectTrigger>
                     <SelectValue placeholder="Select region" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {filteredCities.slice(0, 10).map((city) => (
+                  <SelectContent className="max-h-60 overflow-y-auto">
+                    {filteredCities.map((city) => (
                       <SelectItem key={city} value={city.toLowerCase()}>{city}</SelectItem>
                     ))}
                   </SelectContent>
@@ -249,7 +249,7 @@ const RealEstateEngine: React.FC = () => {
         <Button 
           onClick={handleAnalyze}
           size="lg"
-          className="bg-gradient-primary hover:shadow-glow transition-all duration-300 px-8 py-4 text-lg"
+          className="bg-gradient-primary hover:shadow-glow transition-all duration-300 px-6 md:px-8 py-3 md:py-4 text-base md:text-lg min-h-[48px]"
           disabled={!formData.riskAppetite || !formData.economicEnvironment}
         >
           <Calculator className="mr-2 h-5 w-5" />
@@ -494,7 +494,7 @@ const RealEstateEngine: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-surface">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 md:py-8">
         {currentStep === 'input' && renderInputForm()}
         {currentStep === 'loading' && renderLoadingScreen()}
         {currentStep === 'results' && renderResults()}
