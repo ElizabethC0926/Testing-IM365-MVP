@@ -6,13 +6,13 @@ const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+    <header className="sticky top-0 z-50 bg-header backdrop-blur supports-[backdrop-filter]:bg-header/95 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              CasaClarity
+            <div className="text-2xl font-bold">
+              <span className="text-accent">ImmoSteuer</span><span className="text-primary">365</span>
             </div>
           </div>
 

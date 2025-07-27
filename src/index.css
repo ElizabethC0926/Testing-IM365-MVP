@@ -9,8 +9,9 @@ All colors MUST be HSL - Professional financial theme with trust and growth
 @layer base {
   :root {
     /* Core brand colors - Professional financial theme */
-    --background: 220 20% 98%;
-    --foreground: 220 15% 15%;
+    --background: 210 65% 25%;
+    --foreground: 0 0% 100%;
+    --header: 210 65% 20%;
 
     --card: 0 0% 100%;
     --card-foreground: 220 15% 15%;
@@ -18,9 +19,9 @@ All colors MUST be HSL - Professional financial theme with trust and growth
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
 
-    /* Primary: Deep navy for trust and authority */
-    --primary: 220 70% 15%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: Orange for highlights */
+    --primary: 45 95% 50%;
+    --primary-foreground: 45 95% 10%;
     --primary-glow: 220 70% 25%;
 
     /* Secondary: Sophisticated gray */
@@ -31,9 +32,9 @@ All colors MUST be HSL - Professional financial theme with trust and growth
     --muted: 220 15% 95%;
     --muted-foreground: 220 10% 55%;
 
-    /* Accent: Premium gold for highlights */
-    --accent: 45 85% 55%;
-    --accent-foreground: 220 15% 15%;
+    /* Accent: Blue for branding */
+    --accent: 210 65% 25%;
+    --accent-foreground: 0 0% 100%;
     --accent-glow: 45 85% 65%;
 
     /* Success: Growth green */
