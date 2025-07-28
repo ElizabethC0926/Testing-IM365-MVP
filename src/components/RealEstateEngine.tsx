@@ -90,7 +90,7 @@ const RealEstateEngine: React.FC = () => {
   const renderInputForm = () => (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 bg-card/10 backdrop-blur-sm px-6 py-4 rounded-lg border border-white/20">
           Train decades of investing in minutes.
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -100,7 +100,7 @@ const RealEstateEngine: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         {/* Financial Status */}
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant bg-card/95 backdrop-blur-sm border border-white/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Euro className="h-5 w-5 text-accent" />
@@ -159,7 +159,7 @@ const RealEstateEngine: React.FC = () => {
         </Card>
 
         {/* Economic Environment */}
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant bg-card/95 backdrop-blur-sm border border-white/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-success" />
@@ -198,7 +198,7 @@ const RealEstateEngine: React.FC = () => {
         </Card>
 
         {/* Property Preferences */}
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant bg-card/95 backdrop-blur-sm border border-white/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building className="h-5 w-5 text-primary" />
@@ -249,7 +249,7 @@ const RealEstateEngine: React.FC = () => {
         <Button 
           onClick={handleAnalyze}
           size="lg"
-          className="bg-gradient-primary hover:shadow-glow transition-all duration-300 px-6 md:px-8 py-3 md:py-4 text-base md:text-lg min-h-[48px]"
+          className="bg-card text-card-foreground border-2 border-white/30 hover:bg-white hover:text-card-foreground hover:shadow-elegant transition-all duration-300 px-6 md:px-8 py-3 md:py-4 text-base md:text-lg min-h-[48px] font-semibold"
           disabled={!formData.riskAppetite || !formData.economicEnvironment}
         >
           <Calculator className="mr-2 h-5 w-5" />
