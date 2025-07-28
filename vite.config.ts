@@ -4,7 +4,8 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ base: './' }) => ({
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/Testing-IM365-MVP-main/' : './',
   server: {
     host: "::",
     port: 8080,
