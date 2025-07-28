@@ -8,60 +8,64 @@ All colors MUST be HSL - Professional financial theme with trust and growth
 
 @layer base {
   :root {
-    /* Core brand colors - Professional financial theme */
+    /* Core brand colors - Accessible design with WCAG AA compliance */
     --background: 210 65% 25%;
     --foreground: 0 0% 100%;
-    --header: 210 65% 20%;
+    --header: 210 65% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
+    /* Cards with soft backgrounds and proper contrast */
+    --card: 215 25% 97%;
+    --card-foreground: 0 0% 10%;
 
+    /* Popovers and dropdowns with strong backgrounds */
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --popover-foreground: 0 0% 10%;
 
-    /* Primary: Orange for highlights */
-    --primary: 45 95% 50%;
-    --primary-foreground: 45 95% 10%;
-    --primary-glow: 220 70% 25%;
+    /* Primary: Bright attention-grabbing orange with white text */
+    --primary: 30 95% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 30 95% 65%;
 
-    /* Secondary: Sophisticated gray */
-    --secondary: 220 15% 92%;
-    --secondary-foreground: 220 15% 15%;
+    /* Secondary: Light gray with dark text for good contrast */
+    --secondary: 220 15% 95%;
+    --secondary-foreground: 0 0% 15%;
 
-    /* Muted tones */
-    --muted: 220 15% 95%;
-    --muted-foreground: 220 10% 55%;
+    /* Muted elements with proper contrast */
+    --muted: 220 10% 85%;
+    --muted-foreground: 0 0% 40%;
 
-    /* Accent: Blue for branding */
-    --accent: 210 65% 25%;
+    /* Accent: Deep blue with white text */
+    --accent: 210 65% 35%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 45 85% 65%;
+    --accent-glow: 210 65% 45%;
 
-    /* Success: Growth green */
-    --success: 145 65% 42%;
+    /* Success: Accessible green */
+    --success: 145 60% 40%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning: Attention amber */
-    --warning: 35 90% 55%;
-    --warning-foreground: 220 15% 15%;
+    /* Warning: Accessible amber */
+    --warning: 35 85% 50%;
+    --warning-foreground: 0 0% 10%;
 
-    --destructive: 0 84.2% 60.2%;
+    /* Destructive with proper contrast */
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 90%;
-    --input: 220 15% 96%;
-    --ring: 220 70% 15%;
+    /* Input fields with light backgrounds and dark text */
+    --border: 220 15% 85%;
+    --input: 220 20% 98%;
+    --ring: 210 65% 50%;
 
-    /* Gradients for premium feel */
-    --gradient-primary: linear-gradient(135deg, hsl(220 70% 15%), hsl(220 70% 25%));
-    --gradient-accent: linear-gradient(135deg, hsl(45 85% 55%), hsl(45 85% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 70% 8%), hsl(220 50% 15%), hsl(220 70% 20%));
-    --gradient-surface: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 15% 98%));
+    /* Accessible gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(30 95% 55%), hsl(30 95% 65%));
+    --gradient-accent: linear-gradient(135deg, hsl(210 65% 35%), hsl(210 65% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(210 65% 15%), hsl(210 65% 25%));
+    --gradient-surface: linear-gradient(135deg, hsl(215 25% 97%), hsl(220 20% 98%));
     
-    /* Shadows for depth */
-    --shadow-elegant: 0 10px 30px -10px hsl(220 70% 15% / 0.2);
-    --shadow-glow: 0 0 40px hsl(220 70% 25% / 0.3);
-    --shadow-accent: 0 5px 20px hsl(45 85% 55% / 0.3);
+    /* Enhanced shadows for better card separation */
+    --shadow-elegant: 0 4px 20px -4px hsl(220 15% 0% / 0.15);
+    --shadow-glow: 0 0 30px hsl(30 95% 55% / 0.25);
+    --shadow-accent: 0 4px 15px hsl(210 65% 35% / 0.25);
 
     --radius: 0.5rem;
 
@@ -84,50 +88,58 @@ All colors MUST be HSL - Professional financial theme with trust and growth
 
   .dark {
     --background: 220 25% 8%;
-    --foreground: 220 15% 90%;
+    --foreground: 220 15% 95%;
 
-    --card: 220 20% 10%;
-    --card-foreground: 220 15% 90%;
+    /* Dark mode cards with proper contrast */
+    --card: 220 20% 12%;
+    --card-foreground: 220 15% 95%;
 
-    --popover: 220 20% 10%;
-    --popover-foreground: 220 15% 90%;
+    /* Dark dropdowns with strong backgrounds */
+    --popover: 220 25% 10%;
+    --popover-foreground: 220 15% 95%;
 
-    --primary: 220 70% 55%;
-    --primary-foreground: 220 25% 8%;
-    --primary-glow: 220 70% 65%;
+    /* Bright primary for dark mode */
+    --primary: 30 95% 60%;
+    --primary-foreground: 0 0% 10%;
+    --primary-glow: 30 95% 70%;
 
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 220 15% 90%;
+    /* Dark mode secondary */
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 220 15% 95%;
 
-    --muted: 220 15% 12%;
-    --muted-foreground: 220 10% 60%;
+    /* Dark muted elements */
+    --muted: 220 15% 15%;
+    --muted-foreground: 220 10% 70%;
 
-    --accent: 45 85% 60%;
-    --accent-foreground: 220 25% 8%;
-    --accent-glow: 45 85% 70%;
+    /* Bright accent for dark mode */
+    --accent: 210 70% 55%;
+    --accent-foreground: 0 0% 10%;
+    --accent-glow: 210 70% 65%;
 
-    --success: 145 65% 50%;
-    --success-foreground: 220 25% 8%;
+    /* Accessible dark mode colors */
+    --success: 145 65% 55%;
+    --success-foreground: 0 0% 10%;
 
-    --warning: 35 90% 60%;
-    --warning-foreground: 220 25% 8%;
+    --warning: 35 90% 65%;
+    --warning-foreground: 0 0% 10%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 220 25% 8%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 10%;
 
-    --border: 220 15% 18%;
-    --input: 220 15% 15%;
-    --ring: 220 70% 55%;
+    /* Dark input fields */
+    --border: 220 15% 25%;
+    --input: 220 20% 15%;
+    --ring: 210 70% 60%;
 
-    /* Dark mode gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(220 70% 45%), hsl(220 70% 65%));
-    --gradient-accent: linear-gradient(135deg, hsl(45 85% 50%), hsl(45 85% 70%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 25% 5%), hsl(220 30% 12%), hsl(220 25% 15%));
-    --gradient-surface: linear-gradient(135deg, hsl(220 20% 8%), hsl(220 15% 12%));
+    /* Dark mode accessible gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(30 95% 60%), hsl(30 95% 70%));
+    --gradient-accent: linear-gradient(135deg, hsl(210 70% 55%), hsl(210 70% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 25% 8%), hsl(220 30% 15%));
+    --gradient-surface: linear-gradient(135deg, hsl(220 20% 12%), hsl(220 15% 15%));
     
-    --shadow-elegant: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
-    --shadow-glow: 0 0 40px hsl(220 70% 55% / 0.4);
-    --shadow-accent: 0 5px 20px hsl(45 85% 60% / 0.4);
+    --shadow-elegant: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-glow: 0 0 30px hsl(30 95% 60% / 0.3);
+    --shadow-accent: 0 4px 15px hsl(210 70% 55% / 0.3);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

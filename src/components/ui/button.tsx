@@ -9,17 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant hover:shadow-glow",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 shadow-elegant hover:shadow-glow active:scale-95",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-105 active:scale-95",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground hover:scale-105 active:scale-95",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        premium: "bg-gradient-accent text-accent-foreground hover:shadow-accent font-semibold",
-        hero: "bg-gradient-primary text-primary-foreground hover:shadow-glow font-semibold",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-105 active:scale-95",
+        ghost: "hover:bg-accent/10 hover:text-accent-foreground hover:scale-105 active:scale-95",
+        link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
+        premium: "bg-gradient-accent text-accent-foreground hover:shadow-accent hover:scale-105 active:scale-95 font-semibold",
+        hero: "bg-gradient-primary text-primary-foreground hover:shadow-glow hover:scale-105 active:scale-95 font-semibold",
       },
       size: {
         default: "h-10 px-4 py-2",
