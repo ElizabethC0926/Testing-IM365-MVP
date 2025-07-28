@@ -298,7 +298,7 @@ const RealEstateEngine: React.FC = () => {
   const renderResults = () => (
     <div className="max-w-6xl mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+        <h1 className="text-4xl font-bold text-white/80 mb-2">
           Your Investment Analysis
         </h1>
         <p className="text-muted-foreground">Tailored recommendations based on your profile</p>
@@ -493,7 +493,7 @@ const RealEstateEngine: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-surface">
+    <div className="min-h-screen bg-gradient-hero">
       <div className="container mx-auto px-4 py-6 md:py-8">
         {currentStep === 'input' && renderInputForm()}
         {currentStep === 'loading' && renderLoadingScreen()}
