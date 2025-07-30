@@ -16,10 +16,13 @@ import {
   TrendingUp, 
   Plus, 
   Trash2,
-  CalendarIcon
+  CalendarIcon,
+  Edit3,
+  MapPin
 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -81,6 +84,8 @@ const germanCities = [
 ];
 
 const RealEstateEngine: React.FC = () => {
+  const [editingProperty, setEditingProperty] = useState<{ property: PropertyRecord; type: 'private' | 'company' } | null>(null);
+  const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     privateProperties: [{
       id: '1',
@@ -239,56 +244,191 @@ const RealEstateEngine: React.FC = () => {
     </Popover>
   );
 
-  const PropertyTable = ({ properties, type }: { properties: PropertyRecord[], type: 'private' | 'company' }) => (
+  const openPropertyModal = (property?: PropertyRecord, type?: 'private' | 'company') => {
+    if (property && type) {
+      setEditingProperty({ property, type });
+    } else {
+      setEditingProperty(null);
+    }
+    setIsPropertyModalOpen(true);
+  };
+
+  const saveProperty = () => {
+    if (editingProperty) {
+      // Property already exists, update it
+      updatePropertyRecord(
+        editingProperty.type,
+        editingProperty.property.id,
+        'city',
+        editingProperty.property.city
+      );
+    } else {
+      // Add new property logic handled by addPropertyRecord
+    }
+    setIsPropertyModalOpen(false);
+    setEditingProperty(null);
+  };
+
+  const PropertyCard = ({ property, type }: { property: PropertyRecord, type: 'private' | 'company' }) => (
+    <Card className="border border-border/20 hover:border-primary/30 transition-colors bg-card/50 backdrop-blur-sm">
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h4 className="font-semibold text-lg flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              {property.city || 'Unnamed Property'}, {property.postalCode}
+            </h4>
+            <p className="text-sm text-muted-foreground capitalize">{property.propertyType}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openPropertyModal(property, type)}
+            >
+              <Edit3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => removePropertyRecord(type, property.id)}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-muted-foreground">Annual Rent Income</p>
+            <p className="font-medium text-success">{formatCurrency(property.annualRent)}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Remaining Loan</p>
+            <p className="font-medium text-destructive">{formatCurrency(property.remainingLoan)}</p>
+          </div>
+        </div>
+        
+        {type === 'company' && (
+          <div className="mt-3 pt-3 border-t border-border/20">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Company Type:</span>
+              <span className="font-medium">{property.companyType}</span>
+            </div>
+            {property.tradeReliefApplied && (
+              <div className="mt-1 text-xs text-success">✓ Trade tax relief applied</div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const PropertySection = ({ properties, type, title }: { 
+    properties: PropertyRecord[], 
+    type: 'private' | 'company',
+    title: string 
+  }) => (
     <div className="space-y-4">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>City</TableHead>
-              <TableHead>Postal Code</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Acquisition Date</TableHead>
-              <TableHead>Land Cost</TableHead>
-              <TableHead>Building Cost</TableHead>
-              <TableHead>Annual Rent</TableHead>
-              <TableHead>Operating Costs</TableHead>
-              <TableHead>Bank</TableHead>
-              <TableHead>Original Loan</TableHead>
-              <TableHead>Remaining Loan</TableHead>
-              <TableHead>Interest Rate</TableHead>
-              <TableHead>Fixed Rate Period</TableHead>
-              <TableHead>Annual Repayment</TableHead>
-              {type === 'company' && (
-                <>
-                  <TableHead>Company Type</TableHead>
-                  <TableHead>Trade Relief</TableHead>
-                </>
-              )}
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {properties.map((property) => (
-              <TableRow key={property.id}>
-                <TableCell>
+      <h3 className="text-xl font-semibold">{title}</h3>
+      <Button 
+        onClick={() => {
+          addPropertyRecord(type);
+          // Open modal for the newly created property
+          setTimeout(() => {
+            const newProperty = type === 'private' 
+              ? formData.privateProperties[formData.privateProperties.length - 1]
+              : formData.companyProperties[formData.companyProperties.length - 1];
+            if (newProperty) {
+              openPropertyModal(newProperty, type);
+            }
+          }, 100);
+        }} 
+        variant="outline" 
+        className="w-full border-dashed border-2 border-primary/30 hover:border-primary/50 h-20"
+      >
+        <Plus className="mr-2 h-5 w-5" />
+        Add New Property
+      </Button>
+      
+      {properties.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {properties.map((property) => (
+            <PropertyCard key={property.id} property={property} type={type} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const PropertyModal = () => {
+    const currentProperty = editingProperty?.property || {
+      id: '',
+      city: '',
+      postalCode: '',
+      propertyType: 'Residential',
+      acquisitionDate: undefined,
+      landCost: 0,
+      buildingCost: 0,
+      annualRent: 0,
+      operatingCosts: 0,
+      lendingBank: '',
+      originalLoan: 0,
+      remainingLoan: 0,
+      interestRate: 0,
+      fixedRatePeriod: undefined,
+      annualRepayment: 0,
+      ...(editingProperty?.type === 'company' && {
+        companyType: 'UG',
+        tradeReliefApplied: false
+      })
+    };
+
+    const updateCurrentProperty = (field: string, value: any) => {
+      if (editingProperty) {
+        setEditingProperty({
+          ...editingProperty,
+          property: { ...editingProperty.property, [field]: value }
+        });
+      }
+    };
+
+    return (
+      <Dialog open={isPropertyModalOpen} onOpenChange={setIsPropertyModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingProperty ? 'Edit Property' : 'Add New Property'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h4 className="font-semibold">Basic Information</h4>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Property City</Label>
                   <Input
-                    value={property.city}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'city', e.target.value)}
-                    placeholder="City"
+                    value={currentProperty.city}
+                    onChange={(e) => updateCurrentProperty('city', e.target.value)}
+                    placeholder="Enter city"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Postal Code</Label>
                   <Input
-                    value={property.postalCode}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'postalCode', e.target.value)}
+                    value={currentProperty.postalCode}
+                    onChange={(e) => updateCurrentProperty('postalCode', e.target.value)}
                     placeholder="12345"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Property Type</Label>
                   <Select
-                    value={property.propertyType}
-                    onValueChange={(value) => updatePropertyRecord(type, property.id, 'propertyType', value)}
+                    value={currentProperty.propertyType}
+                    onValueChange={(value) => updateCurrentProperty('propertyType', value)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -299,99 +439,133 @@ const RealEstateEngine: React.FC = () => {
                       <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Acquisition Date</Label>
                   <DatePicker
-                    date={property.acquisitionDate}
-                    onSelect={(date) => updatePropertyRecord(type, property.id, 'acquisitionDate', date)}
+                    date={currentProperty.acquisitionDate}
+                    onSelect={(date) => updateCurrentProperty('acquisitionDate', date)}
                     placeholder="Select date"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Information */}
+            <div className="space-y-4">
+              <h4 className="font-semibold">Financial Information</h4>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Land Acquisition Cost (€)</Label>
                   <Input
                     type="number"
-                    value={property.landCost}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'landCost', Number(e.target.value))}
-                    placeholder="€"
+                    value={currentProperty.landCost}
+                    onChange={(e) => updateCurrentProperty('landCost', Number(e.target.value))}
+                    placeholder="200000"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Building Acquisition Cost (€)</Label>
                   <Input
                     type="number"
-                    value={property.buildingCost}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'buildingCost', Number(e.target.value))}
-                    placeholder="€"
+                    value={currentProperty.buildingCost}
+                    onChange={(e) => updateCurrentProperty('buildingCost', Number(e.target.value))}
+                    placeholder="400000"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Annual Rent Income (€)</Label>
                   <Input
                     type="number"
-                    value={property.annualRent}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'annualRent', Number(e.target.value))}
-                    placeholder="€"
+                    value={currentProperty.annualRent}
+                    onChange={(e) => updateCurrentProperty('annualRent', Number(e.target.value))}
+                    placeholder="24000"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Annual Operating Costs (€)</Label>
                   <Input
                     type="number"
-                    value={property.operatingCosts}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'operatingCosts', Number(e.target.value))}
-                    placeholder="€"
+                    value={currentProperty.operatingCosts}
+                    onChange={(e) => updateCurrentProperty('operatingCosts', Number(e.target.value))}
+                    placeholder="3000"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+              </div>
+            </div>
+
+            {/* Loan Information */}
+            <div className="space-y-4">
+              <h4 className="font-semibold">Loan Information</h4>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Lending Bank</Label>
                   <Input
-                    value={property.lendingBank}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'lendingBank', e.target.value)}
-                    placeholder="Bank name"
+                    value={currentProperty.lendingBank}
+                    onChange={(e) => updateCurrentProperty('lendingBank', e.target.value)}
+                    placeholder="Deutsche Bank"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Original Loan Amount (€)</Label>
                   <Input
                     type="number"
-                    value={property.originalLoan}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'originalLoan', Number(e.target.value))}
-                    placeholder="€"
+                    value={currentProperty.originalLoan}
+                    onChange={(e) => updateCurrentProperty('originalLoan', Number(e.target.value))}
+                    placeholder="480000"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Remaining Loan Balance (€)</Label>
                   <Input
                     type="number"
-                    value={property.remainingLoan}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'remainingLoan', Number(e.target.value))}
-                    placeholder="€"
+                    value={currentProperty.remainingLoan}
+                    onChange={(e) => updateCurrentProperty('remainingLoan', Number(e.target.value))}
+                    placeholder="420000"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Interest Rate (%)</Label>
                   <Input
                     type="number"
                     step="0.1"
-                    value={property.interestRate}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'interestRate', Number(e.target.value))}
-                    placeholder="%"
+                    value={currentProperty.interestRate}
+                    onChange={(e) => updateCurrentProperty('interestRate', Number(e.target.value))}
+                    placeholder="2.5"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="space-y-4">
+              <h4 className="font-semibold">Additional Information</h4>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Fixed Interest Rate Period</Label>
                   <DatePicker
-                    date={property.fixedRatePeriod}
-                    onSelect={(date) => updatePropertyRecord(type, property.id, 'fixedRatePeriod', date)}
+                    date={currentProperty.fixedRatePeriod}
+                    onSelect={(date) => updateCurrentProperty('fixedRatePeriod', date)}
                     placeholder="Fixed until"
                   />
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="space-y-2">
+                  <Label>Annual Repayment (€)</Label>
                   <Input
                     type="number"
-                    value={property.annualRepayment}
-                    onChange={(e) => updatePropertyRecord(type, property.id, 'annualRepayment', Number(e.target.value))}
-                    placeholder="€"
+                    value={currentProperty.annualRepayment}
+                    onChange={(e) => updateCurrentProperty('annualRepayment', Number(e.target.value))}
+                    placeholder="28800"
                   />
-                </TableCell>
-                {type === 'company' && (
+                </div>
+                
+                {editingProperty?.type === 'company' && (
                   <>
-                    <TableCell>
+                    <div className="space-y-2">
+                      <Label>Company Type</Label>
                       <Select
-                        value={property.companyType || 'UG'}
-                        onValueChange={(value) => updatePropertyRecord(type, property.id, 'companyType', value)}
+                        value={currentProperty.companyType || 'UG'}
+                        onValueChange={(value) => updateCurrentProperty('companyType', value)}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -407,35 +581,33 @@ const RealEstateEngine: React.FC = () => {
                           <SelectItem value="Holding Structure">Holding Structure</SelectItem>
                         </SelectContent>
                       </Select>
-                    </TableCell>
-                    <TableCell>
+                    </div>
+                    <div className="flex items-center space-x-2">
                       <Checkbox
-                        checked={property.tradeReliefApplied || false}
-                        onCheckedChange={(checked) => updatePropertyRecord(type, property.id, 'tradeReliefApplied', checked)}
+                        id="trade-relief"
+                        checked={currentProperty.tradeReliefApplied || false}
+                        onCheckedChange={(checked) => updateCurrentProperty('tradeReliefApplied', checked)}
                       />
-                    </TableCell>
+                      <Label htmlFor="trade-relief">Trade tax extension relief applied for</Label>
+                    </div>
                   </>
                 )}
-                <TableCell>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removePropertyRecord(type, property.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      <Button onClick={() => addPropertyRecord(type)} variant="outline" className="w-full">
-        <Plus className="mr-2 h-4 w-4" />
-        Add New Property
-      </Button>
-    </div>
-  );
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-6">
+            <Button variant="outline" onClick={() => setIsPropertyModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveProperty}>
+              Save Property
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-hero p-6">
@@ -459,17 +631,19 @@ const RealEstateEngine: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
-            {/* Privately Held Properties */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Privately Held Properties</h3>
-              <PropertyTable properties={formData.privateProperties} type="private" />
-            </div>
-
-            {/* Company-Held Properties */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Company-Held Properties</h3>
-              <PropertyTable properties={formData.companyProperties} type="company" />
-            </div>
+            <PropertySection 
+              properties={formData.privateProperties} 
+              type="private"
+              title="Privately Held Properties"
+            />
+            
+            <PropertySection 
+              properties={formData.companyProperties} 
+              type="company"
+              title="Company-Held Properties"
+            />
+            
+            <PropertyModal />
           </CardContent>
         </Card>
 
@@ -751,13 +925,13 @@ const RealEstateEngine: React.FC = () => {
         </Card>
 
         {/* D. Economic Environment */}
-        <Card className="shadow-elegant bg-gradient-to-br from-blue-900/90 to-blue-700/90 backdrop-blur-sm border border-blue-400/20 text-white">
+        <Card className="shadow-elegant bg-card/95 backdrop-blur-sm border border-white/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl text-white">
-              <TrendingUp className="h-6 w-6 text-blue-300" />
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <TrendingUp className="h-6 w-6 text-warning" />
               D. Economic Environment
             </CardTitle>
-            <p className="text-blue-100">Please select the future market trend you want the digital twin to simulate for the calculation.</p>
+            <p className="text-muted-foreground">Please select the future market trend you want the digital twin to simulate for the calculation.</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <RadioGroup 
@@ -765,25 +939,25 @@ const RealEstateEngine: React.FC = () => {
               onValueChange={(value) => setFormData(prev => ({ ...prev, economicEnvironment: value }))}
               className="space-y-4"
             >
-              <div className="flex items-start space-x-3 p-4 rounded-lg border border-green-400/30 bg-green-900/20 hover:bg-green-900/30 transition-colors">
-                <RadioGroupItem value="growth" id="growth" className="mt-1 border-green-400 text-green-400" />
+              <div className="flex items-start space-x-3 p-4 rounded-lg border border-success/20 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 hover:from-blue-100 hover:to-blue-150 dark:hover:from-blue-950/30 dark:hover:to-blue-900/30 transition-colors">
+                <RadioGroupItem value="growth" id="growth" className="mt-1" />
                 <div className="space-y-1">
-                  <Label htmlFor="growth" className="font-medium text-green-100">Economic Growth</Label>
-                  <p className="text-sm text-green-200">Low rates, high demand</p>
+                  <Label htmlFor="growth" className="font-medium text-success">Economic Growth</Label>
+                  <p className="text-sm text-muted-foreground">Low rates, high demand</p>
                 </div>
               </div>
-              <div className="flex items-start space-x-3 p-4 rounded-lg border border-yellow-400/30 bg-yellow-900/20 hover:bg-yellow-900/30 transition-colors">
-                <RadioGroupItem value="stable" id="stable" className="mt-1 border-yellow-400 text-yellow-400" />
+              <div className="flex items-start space-x-3 p-4 rounded-lg border border-warning/20 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 hover:from-blue-100 hover:to-blue-150 dark:hover:from-blue-950/30 dark:hover:to-blue-900/30 transition-colors">
+                <RadioGroupItem value="stable" id="stable" className="mt-1" />
                 <div className="space-y-1">
-                  <Label htmlFor="stable" className="font-medium text-yellow-100">Stable Economy</Label>
-                  <p className="text-sm text-yellow-200">Neutral rates, steady market</p>
+                  <Label htmlFor="stable" className="font-medium text-warning">Stable Economy</Label>
+                  <p className="text-sm text-muted-foreground">Neutral rates, steady market</p>
                 </div>
               </div>
-              <div className="flex items-start space-x-3 p-4 rounded-lg border border-red-400/30 bg-red-900/20 hover:bg-red-900/30 transition-colors">
-                <RadioGroupItem value="downturn" id="downturn" className="mt-1 border-red-400 text-red-400" />
+              <div className="flex items-start space-x-3 p-4 rounded-lg border border-destructive/20 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 hover:from-blue-100 hover:to-blue-150 dark:hover:from-blue-950/30 dark:hover:to-blue-900/30 transition-colors">
+                <RadioGroupItem value="downturn" id="downturn" className="mt-1" />
                 <div className="space-y-1">
-                  <Label htmlFor="downturn" className="font-medium text-red-100">Economic Downturn</Label>
-                  <p className="text-sm text-red-200">High rates, rising risks</p>
+                  <Label htmlFor="downturn" className="font-medium text-destructive">Economic Downturn</Label>
+                  <p className="text-sm text-muted-foreground">High rates, rising risks</p>
                 </div>
               </div>
             </RadioGroup>
