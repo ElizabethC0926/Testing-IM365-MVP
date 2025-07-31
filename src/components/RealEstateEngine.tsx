@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Progress } from '@/components/ui/progress';
 import { 
   Building, 
   Euro, 
@@ -25,6 +25,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { ResultsPage } from './ResultsPage';
 
 interface PropertyRecord {
   id: string;
@@ -86,6 +87,8 @@ const germanCities = [
 const RealEstateEngine: React.FC = () => {
   const [editingProperty, setEditingProperty] = useState<{ property: PropertyRecord; type: 'private' | 'company' } | null>(null);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'form' | 'loading' | 'results'>('form');
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     privateProperties: [{
       id: '1',
@@ -255,18 +258,35 @@ const RealEstateEngine: React.FC = () => {
 
   const saveProperty = () => {
     if (editingProperty) {
-      // Property already exists, update it
-      updatePropertyRecord(
-        editingProperty.type,
-        editingProperty.property.id,
-        'city',
-        editingProperty.property.city
-      );
-    } else {
-      // Add new property logic handled by addPropertyRecord
+      // Save all property fields
+      Object.keys(editingProperty.property).forEach(field => {
+        updatePropertyRecord(
+          editingProperty.type,
+          editingProperty.property.id,
+          field,
+          editingProperty.property[field]
+        );
+      });
     }
     setIsPropertyModalOpen(false);
     setEditingProperty(null);
+  };
+
+  const handleSubmit = () => {
+    setCurrentView('loading');
+    setLoadingProgress(0);
+    
+    // Simulate loading progress
+    const interval = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => setCurrentView('results'), 500);
+          return 100;
+        }
+        return prev + Math.random() * 15;
+      });
+    }, 200);
   };
 
   const PropertyCard = ({ property, type }: { property: PropertyRecord, type: 'private' | 'company' }) => (
@@ -608,6 +628,45 @@ const RealEstateEngine: React.FC = () => {
       </Dialog>
     );
   };
+
+  // Loading page component
+  const LoadingPage = () => (
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-6">
+      <div className="max-w-md mx-auto text-center">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Generating Your Optimization Report
+          </h2>
+          <p className="text-muted-foreground">
+            Our AI is analyzing your data and creating personalized recommendations...
+          </p>
+        </div>
+        
+        <div className="space-y-4">
+          <Progress value={loadingProgress} className="w-full h-3" />
+          <p className="text-sm text-muted-foreground">
+            {Math.round(loadingProgress)}% Complete
+          </p>
+        </div>
+        
+        <div className="mt-8 space-y-2 text-sm text-muted-foreground">
+          {loadingProgress < 30 && <p>Analyzing property portfolio...</p>}
+          {loadingProgress >= 30 && loadingProgress < 60 && <p>Calculating tax optimization strategies...</p>}
+          {loadingProgress >= 60 && loadingProgress < 90 && <p>Generating financial forecasts...</p>}
+          {loadingProgress >= 90 && <p>Finalizing recommendations...</p>}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Render different views based on current state
+  if (currentView === 'loading') {
+    return <LoadingPage />;
+  }
+
+  if (currentView === 'results') {
+    return <ResultsPage onBack={() => setCurrentView('form')} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-hero p-6">
@@ -968,6 +1027,7 @@ const RealEstateEngine: React.FC = () => {
         <div className="text-center pt-8">
           <Button 
             size="lg"
+            onClick={handleSubmit}
             className="bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90 px-12 py-4 text-lg font-semibold shadow-glow"
           >
             <FileText className="mr-2 h-5 w-5" />
