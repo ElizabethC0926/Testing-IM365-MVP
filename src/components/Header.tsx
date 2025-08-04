@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <header className="sticky top-0 z-50 bg-header backdrop-blur supports-[backdrop-filter]:bg-header/95 border-b border-border">
@@ -18,11 +20,20 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
+              className="text-foreground hover:text-primary"
+            >
+              <Globe className="h-4 w-4 mr-2" />
+              {language === 'en' ? 'DE' : 'EN'}
+            </Button>
             <Button variant="ghost" className="text-foreground hover:text-primary">
-              Login
+              {t('header.login')}
             </Button>
             <Button className="bg-gradient-primary hover:shadow-glow">
-              Sign Up
+              {t('header.signup')}
             </Button>
           </div>
 
@@ -47,11 +58,19 @@ const Header: React.FC = () => {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-border">
             <div className="px-2 pt-2 pb-3 space-y-1">
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                {language === 'en' ? 'Deutsch' : 'English'}
+              </Button>
               <Button variant="ghost" className="w-full justify-start">
-                Login
+                {t('header.login')}
               </Button>
               <Button className="w-full bg-gradient-primary hover:shadow-glow">
-                Sign Up
+                {t('header.signup')}
               </Button>
             </div>
           </div>

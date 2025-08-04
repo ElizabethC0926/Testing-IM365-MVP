@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Building, 
   Euro, 
@@ -85,6 +86,7 @@ const germanCities = [
 ];
 
 const RealEstateEngine: React.FC = () => {
+  const { t } = useLanguage();
   const [editingProperty, setEditingProperty] = useState<{ property: PropertyRecord; type: 'private' | 'company' } | null>(null);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'form' | 'loading' | 'results'>('form');
@@ -352,7 +354,7 @@ const RealEstateEngine: React.FC = () => {
   }) => (
     <div className="space-y-4">
       <h3 className="text-xl font-semibold">{title}</h3>
-      <Button 
+        <Button 
         onClick={() => {
           addPropertyRecord(type);
           // Open modal for the newly created property
@@ -369,7 +371,7 @@ const RealEstateEngine: React.FC = () => {
         className="w-full border-dashed border-2 border-primary/30 hover:border-primary/50 h-20"
       >
         <Plus className="mr-2 h-5 w-5" />
-        Add New Property
+        {t('form.asset.addNew')}
       </Button>
       
       {properties.length > 0 && (
@@ -618,10 +620,10 @@ const RealEstateEngine: React.FC = () => {
 
           <div className="flex justify-end gap-3 pt-6">
             <Button variant="outline" onClick={() => setIsPropertyModalOpen(false)}>
-              Cancel
+              {t('form.asset.cancel')}
             </Button>
             <Button onClick={saveProperty}>
-              Save Property
+              {t('form.asset.save')}
             </Button>
           </div>
         </DialogContent>
@@ -635,10 +637,10 @@ const RealEstateEngine: React.FC = () => {
       <div className="max-w-md mx-auto text-center">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Generating Your Optimization Report
+            {t('form.loading')}
           </h2>
           <p className="text-muted-foreground">
-            Our AI is analyzing your data and creating personalized recommendations...
+            {t('form.loading')}
           </p>
         </div>
         
@@ -674,10 +676,10 @@ const RealEstateEngine: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            10-Year German Real Estate Tax Optimization Model
+            {t('form.title')}
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Comprehensive analysis and optimization of your real estate portfolio
+            {t('form.subtitle')}
           </p>
         </div>
 
@@ -686,20 +688,20 @@ const RealEstateEngine: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Building className="h-6 w-6 text-primary" />
-              A. Asset Portfolio Status
+              {t('form.asset.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
             <PropertySection 
               properties={formData.privateProperties} 
               type="private"
-              title="Privately Held Properties"
+              title={t('form.asset.private')}
             />
             
             <PropertySection 
               properties={formData.companyProperties} 
               type="company"
-              title="Company-Held Properties"
+              title={t('form.asset.company')}
             />
             
             <PropertyModal />
@@ -1031,7 +1033,7 @@ const RealEstateEngine: React.FC = () => {
             className="bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90 px-12 py-4 text-lg font-semibold shadow-glow"
           >
             <FileText className="mr-2 h-5 w-5" />
-            Generate 10-Year Optimization Report
+            {t('form.submit')}
           </Button>
         </div>
       </div>

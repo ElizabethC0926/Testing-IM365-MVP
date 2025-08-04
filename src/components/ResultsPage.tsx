@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { ArrowLeft, TrendingUp, DollarSign, Percent, Target } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ResultsPageProps {
   onBack: () => void;
@@ -70,6 +71,7 @@ const chartConfig = {
 };
 
 export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -77,22 +79,22 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
         <div className="flex items-center gap-4 mb-8">
           <Button onClick={onBack} variant="outline" size="sm">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Form
+            {t('results.backToForm')}
           </Button>
           <h1 className="text-3xl font-bold text-slate-900">
-            10-Year German Real Estate Tax Optimization Results
+            {t('results.title')}
           </h1>
         </div>
 
         {/* Module A: Core Strategy Recommendation */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-2xl text-primary">A. Core Strategy Recommendation (Strategieempfehlung)</CardTitle>
+            <CardTitle className="text-2xl text-primary">{t('results.strategy.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
             {/* Structural Recommendations */}
             <div>
-              <h3 className="text-xl font-semibold mb-4 text-slate-800">Structural Recommendations</h3>
+              <h3 className="text-xl font-semibold mb-4 text-slate-800">{t('results.strategy.structural')}</h3>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-primary rounded-full mt-2"></span>
@@ -115,7 +117,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
 
             {/* Action Timeline */}
             <div>
-              <h3 className="text-xl font-semibold mb-4 text-slate-800">10-Year Action Timeline</h3>
+              <h3 className="text-xl font-semibold mb-4 text-slate-800">{t('results.strategy.timeline')}</h3>
               <div className="space-y-4">
                 {[
                   { year: 1, action: "Initial portfolio optimization and cash flow improvement strategies" },
@@ -209,11 +211,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
             <div>
               <h3 className="text-xl font-semibold mb-4 text-slate-800">Detailed Forecast Charts</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Chart 1: Cash Flow */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Projected After-Tax Cash Flow per Year</CardTitle>
-                  </CardHeader>
+              {/* Chart 1: Cash Flow */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">{t('results.forecast.chart1')}</CardTitle>
+                </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig} className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
@@ -229,11 +231,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
                   </CardContent>
                 </Card>
 
-                {/* Chart 2: Tax Burden */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Projected Tax Burden per Year</CardTitle>
-                  </CardHeader>
+              {/* Chart 2: Tax Burden */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">{t('results.forecast.chart2')}</CardTitle>
+                </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig} className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
