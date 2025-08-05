@@ -713,7 +713,7 @@ const RealEstateEngine: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Euro className="h-6 w-6 text-accent" />
-              B. Financial & Legal Status
+              {t('form.financial.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
@@ -799,7 +799,7 @@ const RealEstateEngine: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Target className="h-6 w-6 text-success" />
-              C. Strategic Goals & Constraints
+              {t('form.goals.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
@@ -990,7 +990,7 @@ const RealEstateEngine: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <TrendingUp className="h-6 w-6 text-warning" />
-              D. Economic Environment
+              {t('form.economy.title')}
             </CardTitle>
             <p className="text-muted-foreground">Please select the future market trend you want the digital twin to simulate for the calculation.</p>
           </CardHeader>

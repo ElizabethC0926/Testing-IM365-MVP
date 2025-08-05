@@ -43,13 +43,13 @@ const translations = {
     'form.asset.save': 'Save Property',
     'form.asset.cancel': 'Cancel',
     
-    'form.financial.title': 'B. Financial Status',
+    'form.financial.title': 'B. Financial & Legal Status',
     'form.financial.income': 'Annual Income (€)',
     'form.financial.cash': 'Available Cash (€)',
     'form.financial.debt': 'Other Debts (€)',
     'form.financial.taxRate': 'Personal Tax Rate (%)',
     
-    'form.goals.title': 'C. Strategic Goals',
+    'form.goals.title': 'C. Strategic Goals & Constraints',
     'form.goals.primary': 'Primary Goal',
     'form.goals.timeline': 'Investment Timeline',
     'form.goals.risk': 'Risk Tolerance',
@@ -154,13 +154,13 @@ const translations = {
     'form.asset.save': 'Immobilie speichern',
     'form.asset.cancel': 'Abbrechen',
     
-    'form.financial.title': 'B. Finanzstatus',
+    'form.financial.title': 'B. Finanz- & Rechtsstatus',
     'form.financial.income': 'Jahreseinkommen (€)',
     'form.financial.cash': 'Verfügbares Bargeld (€)',
     'form.financial.debt': 'Andere Schulden (€)',
     'form.financial.taxRate': 'Persönlicher Steuersatz (%)',
     
-    'form.goals.title': 'C. Strategische Ziele',
+    'form.goals.title': 'C. Strategische Ziele & Beschränkungen',
     'form.goals.primary': 'Hauptziel',
     'form.goals.timeline': 'Investitionszeitraum',
     'form.goals.risk': 'Risikotoleranz',
