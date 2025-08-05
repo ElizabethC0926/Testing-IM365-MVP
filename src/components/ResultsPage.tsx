@@ -98,19 +98,19 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-primary rounded-full mt-2"></span>
-                  Establish a property-managing GmbH (VV-GmbH) in Year 2 to optimize tax benefits and liability protection.
+                  {t('strategy.recommendation1')}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-primary rounded-full mt-2"></span>
-                  Transfer privately held properties A and B into the company structure via Share Deal to minimize transaction costs.
+                  {t('strategy.recommendation2')}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-primary rounded-full mt-2"></span>
-                  Utilize family members' gift tax allowances (Schenkungssteuerfreibetrag) for Property C in Year 4.
+                  {t('strategy.recommendation3')}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-primary rounded-full mt-2"></span>
-                  Implement a holding structure in Year 6 to further optimize tax efficiency and enable future expansion.
+                  {t('strategy.recommendation4')}
                 </li>
               </ul>
             </div>
@@ -120,16 +120,16 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
               <h3 className="text-xl font-semibold mb-4 text-slate-800">{t('results.strategy.timeline')}</h3>
               <div className="space-y-4">
                 {[
-                  { year: 1, action: "Initial portfolio optimization and cash flow improvement strategies" },
-                  { year: 2, action: "Establish 'Mustermann VV-GmbH'. Transfer private properties A and B into the company." },
-                  { year: 3, action: "Perform €50,000 modernization on Property C (Herstellungskosten) financed through Bank D loan." },
-                  { year: 4, action: "Transfer Property C to family member using gift tax allowances." },
-                  { year: 5, action: "Refinance Loan X (Umschuldung) to secure lower interest rate of 2.8%." },
-                  { year: 6, action: "Establish holding structure for tax optimization." },
-                  { year: 7, action: "Make special repayment (Sondertilgung) of €50,000 on Loan Y using accumulated cash flow." },
-                  { year: 8, action: "Acquire new investment property through company structure." },
-                  { year: 9, action: "Optimize depreciation schedules and prepare for exit strategies." },
-                  { year: 10, action: "Sell privately held Property D (after 10-year tax-free holding period)." },
+                  { year: 1, action: t('timeline.year1') },
+                  { year: 2, action: t('timeline.year2') },
+                  { year: 3, action: t('timeline.year3') },
+                  { year: 4, action: t('timeline.year4') },
+                  { year: 5, action: t('timeline.year5') },
+                  { year: 6, action: t('timeline.year6') },
+                  { year: 7, action: t('timeline.year7') },
+                  { year: 8, action: t('timeline.year8') },
+                  { year: 9, action: t('timeline.year9') },
+                  { year: 10, action: t('timeline.year10') },
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-4">
                     <div className="w-16 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-semibold text-sm">
@@ -146,21 +146,21 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
         {/* Module B: Financial Forecast & Comparison */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-2xl text-primary">B. Financial Forecast & Comparison (Finanzprognose & Vergleich)</CardTitle>
+            <CardTitle className="text-2xl text-primary">{t('results.forecast.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
             {/* KPIs */}
             <div>
-              <h3 className="text-xl font-semibold mb-4 text-slate-800">Key Performance Indicators</h3>
+              <h3 className="text-xl font-semibold mb-4 text-slate-800">{t('results.forecast.kpis')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <DollarSign className="w-8 h-8 text-green-600" />
                       <div>
-                        <p className="text-sm text-green-700">10-Year Tax Savings</p>
+                        <p className="text-sm text-green-700">{t('results.forecast.taxSavings')}</p>
                         <p className="text-2xl font-bold text-green-800">€127,500</p>
-                        <p className="text-xs text-green-600">vs. non-optimized</p>
+                        <p className="text-xs text-green-600">{t('results.forecast.comparedTo')}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -171,7 +171,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
                     <div className="flex items-center gap-3">
                       <Target className="w-8 h-8 text-blue-600" />
                       <div>
-                        <p className="text-sm text-blue-700">Net Worth Year 10</p>
+                        <p className="text-sm text-blue-700">{t('results.forecast.netWorth')}</p>
                         <p className="text-2xl font-bold text-blue-800">€450,000</p>
                         <p className="text-xs text-blue-600">Assets - Liabilities</p>
                       </div>
@@ -184,7 +184,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
                     <div className="flex items-center gap-3">
                       <Percent className="w-8 h-8 text-purple-600" />
                       <div>
-                        <p className="text-sm text-purple-700">Avg. Return on Assets</p>
+                        <p className="text-sm text-purple-700">{t('results.forecast.roa')}</p>
                         <p className="text-2xl font-bold text-purple-800">7.2%</p>
                         <p className="text-xs text-purple-600">10-year average</p>
                       </div>
@@ -197,7 +197,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
                     <div className="flex items-center gap-3">
                       <TrendingUp className="w-8 h-8 text-orange-600" />
                       <div>
-                        <p className="text-sm text-orange-700">Avg. Return on Equity</p>
+                        <p className="text-sm text-orange-700">{t('results.forecast.roe')}</p>
                         <p className="text-2xl font-bold text-orange-800">12.8%</p>
                         <p className="text-xs text-orange-600">10-year average</p>
                       </div>
@@ -253,9 +253,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
 
                 {/* Chart 3: Net Worth */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Projected Net Worth Growth Curve</CardTitle>
-                  </CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-lg">{t('results.forecast.chart3')}</CardTitle>
+                </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig} className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
@@ -273,9 +273,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
 
                 {/* Chart 4: Liabilities */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Projected Total Liabilities Curve</CardTitle>
-                  </CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-lg">{t('results.forecast.chart4')}</CardTitle>
+                </CardHeader>
                   <CardContent>
                     <ChartContainer config={chartConfig} className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
@@ -298,31 +298,31 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onBack }) => {
         {/* Module C: Sensitivity & Risk Analysis */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-2xl text-primary">C. Sensitivity & Risk Analysis (Sensitivitäts- & Risikoanalyse)</CardTitle>
+            <CardTitle className="text-2xl text-primary">{t('results.risk.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div>
-              <h3 className="text-xl font-semibold mb-4 text-slate-800">Key Risk Factors</h3>
+              <h3 className="text-xl font-semibold mb-4 text-slate-800">{t('results.risk.factors')}</h3>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-red-500 rounded-full mt-2"></span>
-                  This strategy is highly dependent on the value appreciation of Property A and overall market conditions.
+                  {t('risk.factor1')}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-red-500 rounded-full mt-2"></span>
-                  The success of the refinancing plan in Year 5 is subject to market interest rate conditions at that time.
+                  {t('risk.factor2')}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-red-500 rounded-full mt-2"></span>
-                  Changes in tax legislation could significantly impact the effectiveness of the proposed structure.
+                  {t('risk.factor3')}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-red-500 rounded-full mt-2"></span>
-                  Family gift tax strategy requires cooperation and may face personal or legal constraints.
+                  {t('risk.factor4')}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-red-500 rounded-full mt-2"></span>
-                  Please rerun the model if there's any change in the portfolio or market environment.
+                  {t('risk.factor5')}
                 </li>
               </ul>
             </div>

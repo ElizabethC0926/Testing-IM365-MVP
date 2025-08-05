@@ -456,9 +456,9 @@ const RealEstateEngine: React.FC = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Residential">Residential</SelectItem>
-                      <SelectItem value="Commercial">Commercial</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Residential">{t('options.propertyType.residential')}</SelectItem>
+                      <SelectItem value="Commercial">{t('options.propertyType.commercial')}</SelectItem>
+                      <SelectItem value="Other">{t('options.propertyType.mixed')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
