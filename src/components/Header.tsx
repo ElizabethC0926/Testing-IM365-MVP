@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 bg-header backdrop-blur supports-[backdrop-filter]:bg-header/95 border-b border-border">
@@ -29,10 +31,17 @@ const Header: React.FC = () => {
               <Globe className="h-4 w-4 mr-2" />
               {language === 'en' ? 'DE' : 'EN'}
             </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
+            <Button 
+              variant="ghost" 
+              className="text-foreground hover:text-primary"
+              onClick={() => navigate('/login')}
+            >
               {t('header.login')}
             </Button>
-            <Button className="bg-gradient-primary hover:shadow-glow">
+            <Button 
+              className="bg-gradient-primary hover:shadow-glow"
+              onClick={() => navigate('/signup')}
+            >
               {t('header.signup')}
             </Button>
           </div>
@@ -66,10 +75,17 @@ const Header: React.FC = () => {
                 <Globe className="h-4 w-4 mr-2" />
                 {language === 'en' ? 'Deutsch' : 'English'}
               </Button>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => navigate('/login')}
+              >
                 {t('header.login')}
               </Button>
-              <Button className="w-full bg-gradient-primary hover:shadow-glow">
+              <Button 
+                className="w-full bg-gradient-primary hover:shadow-glow"
+                onClick={() => navigate('/signup')}
+              >
                 {t('header.signup')}
               </Button>
             </div>

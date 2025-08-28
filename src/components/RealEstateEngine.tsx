@@ -385,29 +385,40 @@ const RealEstateEngine: React.FC = () => {
   );
 
   const PropertyModal = () => {
-    const currentProperty = editingProperty?.property || {
-      id: '',
-      city: '',
-      postalCode: '',
-      propertyType: 'Residential',
-      acquisitionDate: undefined,
-      landCost: 0,
-      buildingCost: 0,
-      annualRent: 0,
-      operatingCosts: 0,
-      lendingBank: '',
-      originalLoan: 0,
-      remainingLoan: 0,
-      interestRate: 0,
-      fixedRatePeriod: undefined,
-      annualRepayment: 0,
-      ...(editingProperty?.type === 'company' && {
-        companyType: 'UG',
-        tradeReliefApplied: false
-      })
-    };
+    // Initialize currentProperty with editing property or default values
+    const [currentProperty, setCurrentProperty] = useState(() => {
+      return editingProperty?.property || {
+        id: '',
+        city: '',
+        postalCode: '',
+        propertyType: 'Residential',
+        acquisitionDate: undefined,
+        landCost: 0,
+        buildingCost: 0,
+        annualRent: 0,
+        operatingCosts: 0,
+        lendingBank: '',
+        originalLoan: 0,
+        remainingLoan: 0,
+        interestRate: 0,
+        fixedRatePeriod: undefined,
+        annualRepayment: 0,
+        ...(editingProperty?.type === 'company' && {
+          companyType: 'UG',
+          tradeReliefApplied: false
+        })
+      };
+    });
+
+    // Update currentProperty when editingProperty changes
+    React.useEffect(() => {
+      if (editingProperty?.property) {
+        setCurrentProperty(editingProperty.property);
+      }
+    }, [editingProperty]);
 
     const updateCurrentProperty = (field: string, value: any) => {
+      setCurrentProperty(prev => ({ ...prev, [field]: value }));
       if (editingProperty) {
         setEditingProperty({
           ...editingProperty,
@@ -418,7 +429,7 @@ const RealEstateEngine: React.FC = () => {
 
     return (
       <Dialog open={isPropertyModalOpen} onOpenChange={setIsPropertyModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/100 backdrop-blur-sm">
           <DialogHeader>
             <DialogTitle>
               {editingProperty ? 'Edit Property' : 'Add New Property'}
