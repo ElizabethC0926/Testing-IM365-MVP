@@ -8,6 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Building, 
@@ -385,258 +390,494 @@ const RealEstateEngine: React.FC = () => {
   );
 
   const PropertyModal = () => {
-    // Initialize currentProperty with editing property or default values
-    const [currentProperty, setCurrentProperty] = useState(() => {
-      return editingProperty?.property || {
-        id: '',
-        city: '',
-        postalCode: '',
-        propertyType: 'Residential',
-        acquisitionDate: undefined,
-        landCost: 0,
-        buildingCost: 0,
-        annualRent: 0,
-        operatingCosts: 0,
-        lendingBank: '',
-        originalLoan: 0,
-        remainingLoan: 0,
-        interestRate: 0,
-        fixedRatePeriod: undefined,
-        annualRepayment: 0,
-        ...(editingProperty?.type === 'company' && {
-          companyType: 'UG',
-          tradeReliefApplied: false
-        })
-      };
+    const { toast } = useToast();
+
+    // Form validation schema
+    const propertySchema = z.object({
+      city: z.string().min(1, "City is required"),
+      postalCode: z.string().min(3, "Postal code must be at least 3 characters"),
+      propertyType: z.enum(["Residential", "Commercial", "Other"]),
+      acquisitionDate: z.date().optional(),
+      landCost: z.number().min(0, "Land cost must be positive"),
+      buildingCost: z.number().min(0, "Building cost must be positive"),
+      annualRent: z.number().min(0, "Annual rent must be positive"),
+      operatingCosts: z.number().min(0, "Operating costs must be positive"),
+      lendingBank: z.string().optional(),
+      originalLoan: z.number().min(0, "Original loan must be positive"),
+      remainingLoan: z.number().min(0, "Remaining loan must be positive"),
+      interestRate: z.number().min(0).max(100, "Interest rate must be between 0-100%"),
+      fixedRatePeriod: z.date().optional(),
+      annualRepayment: z.number().min(0, "Annual repayment must be positive"),
+      companyType: z.string().optional(),
+      tradeReliefApplied: z.boolean().optional(),
     });
 
-    // Update currentProperty when editingProperty changes
-    React.useEffect(() => {
-      if (editingProperty?.property) {
-        setCurrentProperty(editingProperty.property);
-      }
-    }, [editingProperty]);
+    type PropertyFormData = z.infer<typeof propertySchema>;
 
-    const updateCurrentProperty = (field: string, value: any) => {
-      setCurrentProperty(prev => ({ ...prev, [field]: value }));
-      if (editingProperty) {
-        setEditingProperty({
-          ...editingProperty,
-          property: { ...editingProperty.property, [field]: value }
+    // Initialize form with existing property data or defaults
+    const defaultValues: PropertyFormData = React.useMemo(() => ({
+      city: editingProperty?.property.city || "",
+      postalCode: editingProperty?.property.postalCode || "",
+      propertyType: (editingProperty?.property.propertyType as "Residential" | "Commercial" | "Other") || "Residential",
+      acquisitionDate: editingProperty?.property.acquisitionDate,
+      landCost: editingProperty?.property.landCost || 0,
+      buildingCost: editingProperty?.property.buildingCost || 0,
+      annualRent: editingProperty?.property.annualRent || 0,
+      operatingCosts: editingProperty?.property.operatingCosts || 0,
+      lendingBank: editingProperty?.property.lendingBank || "",
+      originalLoan: editingProperty?.property.originalLoan || 0,
+      remainingLoan: editingProperty?.property.remainingLoan || 0,
+      interestRate: editingProperty?.property.interestRate || 0,
+      fixedRatePeriod: editingProperty?.property.fixedRatePeriod,
+      annualRepayment: editingProperty?.property.annualRepayment || 0,
+      companyType: editingProperty?.property.companyType || "UG",
+      tradeReliefApplied: editingProperty?.property.tradeReliefApplied || false,
+    }), [editingProperty]);
+
+    const form = useForm<PropertyFormData>({
+      resolver: zodResolver(propertySchema),
+      defaultValues,
+    });
+
+    // Reset form when editing property changes
+    React.useEffect(() => {
+      form.reset(defaultValues);
+    }, [editingProperty, form, defaultValues]);
+
+    const handleSave = async (data: PropertyFormData) => {
+      try {
+        if (editingProperty) {
+          // Update property with all form data
+          Object.keys(data).forEach(field => {
+            updatePropertyRecord(
+              editingProperty.type,
+              editingProperty.property.id,
+              field,
+              data[field as keyof PropertyFormData]
+            );
+          });
+          
+          toast({
+            title: "Property Updated",
+            description: "Property details have been successfully updated.",
+            variant: "default",
+          });
+        }
+
+        setIsPropertyModalOpen(false);
+        setEditingProperty(null);
+        form.reset();
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to save property. Please try again.",
+          variant: "destructive",
         });
       }
     };
 
+    const handleCancel = () => {
+      form.reset();
+      setIsPropertyModalOpen(false);
+      setEditingProperty(null);
+    };
+
+    // Handle Escape key
+    React.useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && isPropertyModalOpen) {
+          handleCancel();
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isPropertyModalOpen]);
+
     return (
-      <Dialog open={isPropertyModalOpen} onOpenChange={setIsPropertyModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/100 backdrop-blur-sm">
+      <Dialog 
+        open={isPropertyModalOpen} 
+        onOpenChange={(open) => {
+          if (!open) handleCancel();
+        }}
+      >
+        <DialogContent 
+          className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border focus:outline-none"
+          role="dialog"
+          aria-labelledby="property-modal-title"
+          aria-describedby="property-modal-description"
+        >
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle id="property-modal-title" className="text-card-foreground">
               {editingProperty ? 'Edit Property' : 'Add New Property'}
             </DialogTitle>
+            <p id="property-modal-description" className="text-muted-foreground">
+              {editingProperty ? 'Update your property information below.' : 'Enter details for your new property.'}
+            </p>
           </DialogHeader>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Basic Information */}
-            <div className="space-y-4">
-              <h4 className="font-semibold">Basic Information</h4>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Property City</Label>
-                  <Input
-                    value={currentProperty.city}
-                    onChange={(e) => updateCurrentProperty('city', e.target.value)}
-                    placeholder="Enter city"
-                  />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-card-foreground">Basic Information</h4>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Property City *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="Enter city"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="postalCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Postal Code *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="12345"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="propertyType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Property Type</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-input text-card-foreground border-border">
+                                <SelectValue placeholder="Select property type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-popover text-popover-foreground border-border">
+                              <SelectItem value="Residential">{t('options.propertyType.residential')}</SelectItem>
+                              <SelectItem value="Commercial">{t('options.propertyType.commercial')}</SelectItem>
+                              <SelectItem value="Other">{t('options.propertyType.mixed')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="acquisitionDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Acquisition Date</FormLabel>
+                          <FormControl>
+                            <DatePicker
+                              date={field.value}
+                              onSelect={field.onChange}
+                              placeholder="Select date"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Postal Code</Label>
-                  <Input
-                    value={currentProperty.postalCode}
-                    onChange={(e) => updateCurrentProperty('postalCode', e.target.value)}
-                    placeholder="12345"
-                  />
+
+                {/* Financial Information */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-card-foreground">Financial Information</h4>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="landCost"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Land Acquisition Cost (€) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="200000"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="buildingCost"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Building Acquisition Cost (€) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="400000"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="annualRent"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Annual Rent Income (€) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="24000"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="operatingCosts"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Annual Operating Costs (€) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="3000"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Property Type</Label>
-                  <Select
-                    value={currentProperty.propertyType}
-                    onValueChange={(value) => updateCurrentProperty('propertyType', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Residential">{t('options.propertyType.residential')}</SelectItem>
-                      <SelectItem value="Commercial">{t('options.propertyType.commercial')}</SelectItem>
-                      <SelectItem value="Other">{t('options.propertyType.mixed')}</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                {/* Loan Information */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-card-foreground">Loan Information</h4>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="lendingBank"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Lending Bank</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="Deutsche Bank"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="originalLoan"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Original Loan Amount (€) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="480000"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="remainingLoan"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Remaining Loan Balance (€) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="420000"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="interestRate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Interest Rate (%) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              step="0.1"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="2.5"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Acquisition Date</Label>
-                  <DatePicker
-                    date={currentProperty.acquisitionDate}
-                    onSelect={(date) => updateCurrentProperty('acquisitionDate', date)}
-                    placeholder="Select date"
-                  />
+
+                {/* Additional Information */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-card-foreground">Additional Information</h4>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="fixedRatePeriod"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Fixed Interest Rate Period</FormLabel>
+                          <FormControl>
+                            <DatePicker
+                              date={field.value}
+                              onSelect={field.onChange}
+                              placeholder="Fixed until"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="annualRepayment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-card-foreground">Annual Repayment (€) *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              placeholder="28800"
+                              className="bg-input text-card-foreground placeholder:text-muted-foreground border-border focus:ring-ring"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {editingProperty?.type === 'company' && (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="companyType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-card-foreground">Company Type</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-input text-card-foreground border-border">
+                                    <SelectValue placeholder="Select company type" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-popover text-popover-foreground border-border">
+                                  <SelectItem value="UG">UG</SelectItem>
+                                  <SelectItem value="GmbH">GmbH</SelectItem>
+                                  <SelectItem value="AG">AG</SelectItem>
+                                  <SelectItem value="GbR">GbR</SelectItem>
+                                  <SelectItem value="oHG">oHG</SelectItem>
+                                  <SelectItem value="KG">KG</SelectItem>
+                                  <SelectItem value="GmbH & Co. KG">GmbH & Co. KG</SelectItem>
+                                  <SelectItem value="Holding Structure">Holding Structure</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="tradeReliefApplied"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-card-foreground">
+                                  Trade tax extension relief applied for
+                                </FormLabel>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Financial Information */}
-            <div className="space-y-4">
-              <h4 className="font-semibold">Financial Information</h4>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Land Acquisition Cost (€)</Label>
-                  <Input
-                    type="number"
-                    value={currentProperty.landCost}
-                    onChange={(e) => updateCurrentProperty('landCost', Number(e.target.value))}
-                    placeholder="200000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Building Acquisition Cost (€)</Label>
-                  <Input
-                    type="number"
-                    value={currentProperty.buildingCost}
-                    onChange={(e) => updateCurrentProperty('buildingCost', Number(e.target.value))}
-                    placeholder="400000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Annual Rent Income (€)</Label>
-                  <Input
-                    type="number"
-                    value={currentProperty.annualRent}
-                    onChange={(e) => updateCurrentProperty('annualRent', Number(e.target.value))}
-                    placeholder="24000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Annual Operating Costs (€)</Label>
-                  <Input
-                    type="number"
-                    value={currentProperty.operatingCosts}
-                    onChange={(e) => updateCurrentProperty('operatingCosts', Number(e.target.value))}
-                    placeholder="3000"
-                  />
-                </div>
+              <div className="flex justify-end gap-3 pt-6 border-t border-border">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleCancel}
+                  className="min-w-[80px]"
+                >
+                  {t('form.asset.cancel')}
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={!form.formState.isValid || form.formState.isSubmitting}
+                  className="min-w-[80px]"
+                >
+                  {form.formState.isSubmitting ? 'Saving...' : t('form.asset.save')}
+                </Button>
               </div>
-            </div>
-
-            {/* Loan Information */}
-            <div className="space-y-4">
-              <h4 className="font-semibold">Loan Information</h4>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Lending Bank</Label>
-                  <Input
-                    value={currentProperty.lendingBank}
-                    onChange={(e) => updateCurrentProperty('lendingBank', e.target.value)}
-                    placeholder="Deutsche Bank"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Original Loan Amount (€)</Label>
-                  <Input
-                    type="number"
-                    value={currentProperty.originalLoan}
-                    onChange={(e) => updateCurrentProperty('originalLoan', Number(e.target.value))}
-                    placeholder="480000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Remaining Loan Balance (€)</Label>
-                  <Input
-                    type="number"
-                    value={currentProperty.remainingLoan}
-                    onChange={(e) => updateCurrentProperty('remainingLoan', Number(e.target.value))}
-                    placeholder="420000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Interest Rate (%)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={currentProperty.interestRate}
-                    onChange={(e) => updateCurrentProperty('interestRate', Number(e.target.value))}
-                    placeholder="2.5"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Information */}
-            <div className="space-y-4">
-              <h4 className="font-semibold">Additional Information</h4>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Fixed Interest Rate Period</Label>
-                  <DatePicker
-                    date={currentProperty.fixedRatePeriod}
-                    onSelect={(date) => updateCurrentProperty('fixedRatePeriod', date)}
-                    placeholder="Fixed until"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Annual Repayment (€)</Label>
-                  <Input
-                    type="number"
-                    value={currentProperty.annualRepayment}
-                    onChange={(e) => updateCurrentProperty('annualRepayment', Number(e.target.value))}
-                    placeholder="28800"
-                  />
-                </div>
-                
-                {editingProperty?.type === 'company' && (
-                  <>
-                    <div className="space-y-2">
-                      <Label>Company Type</Label>
-                      <Select
-                        value={currentProperty.companyType || 'UG'}
-                        onValueChange={(value) => updateCurrentProperty('companyType', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="UG">UG</SelectItem>
-                          <SelectItem value="GmbH">GmbH</SelectItem>
-                          <SelectItem value="AG">AG</SelectItem>
-                          <SelectItem value="GbR">GbR</SelectItem>
-                          <SelectItem value="oHG">oHG</SelectItem>
-                          <SelectItem value="KG">KG</SelectItem>
-                          <SelectItem value="GmbH & Co. KG">GmbH & Co. KG</SelectItem>
-                          <SelectItem value="Holding Structure">Holding Structure</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="trade-relief"
-                        checked={currentProperty.tradeReliefApplied || false}
-                        onCheckedChange={(checked) => updateCurrentProperty('tradeReliefApplied', checked)}
-                      />
-                      <Label htmlFor="trade-relief">Trade tax extension relief applied for</Label>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-6">
-            <Button variant="outline" onClick={() => setIsPropertyModalOpen(false)}>
-              {t('form.asset.cancel')}
-            </Button>
-            <Button onClick={saveProperty}>
-              {t('form.asset.save')}
-            </Button>
-          </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     );
